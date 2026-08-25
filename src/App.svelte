@@ -97,7 +97,7 @@
 </script>
 
 <svelte:head>
-    <title>D&D 2024 Point Buy Calculator</title>
+    <title>5E Point Buy Calculator</title>
 </svelte:head>
 
 <main class="app" aria-label="Dungeons and Dragons point buy calculator">

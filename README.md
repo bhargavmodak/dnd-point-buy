@@ -1,47 +1,116 @@
-# Svelte + TS + Vite
+# D&D 2024 Point Buy Calculator
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+A clean, interactive character ability score calculator for the **Dungeons & Dragons 2024 Point Buy system**.
 
-## Recommended IDE Setup
+**[Live Demo](https://<your-github-username>.github.io/dnd-point-buy/)**
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+## ✨ Features
 
-## Need an official Svelte framework?
+* **27-point budget** with a visual remaining-points bar
+* Ability scores from **8 to 15**
+* Automatic Point Buy cost calculation
+* Live ability modifiers
+* Interactive Strength, Dexterity, Constitution, Intelligence, Wisdom, and Charisma cards
+* Prevents spending points that aren't available
+* Reset to the default 8/8/8/8/8/8 scores
+* One-click **Standard Array** (15, 14, 13, 12, 10, 8)
+* Responsive dark-fantasy UI
+* Smooth visual feedback and transitions
+* Runs entirely in the browser
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+## 🎲 Point Buy Rules
 
-## Technical considerations
+The calculator uses the following Point Buy costs:
 
-**Why use this over SvelteKit?**
+| Score | Cost |
+| ----: | ---: |
+|     8 |    0 |
+|     9 |    1 |
+|    10 |    2 |
+|    11 |    3 |
+|    12 |    4 |
+|    13 |    5 |
+|    14 |    7 |
+|    15 |    9 |
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+Every ability starts at **8**, with **27 points** available to spend.
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+The calculator does not include ability score increases from backgrounds, feats, or other character creation choices. It is specifically focused on generating the base ability scores.
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+## 🛠️ Tech Stack
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+* [Svelte 5](https://svelte.dev/)
+* TypeScript
+* Vite
+* CSS
+* Font Awesome
+* GitHub Pages
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+The project uses a component-based Svelte architecture while keeping the game rules separate from the UI.
 
-**Why include `.vscode/extensions.json`?**
+## 📁 Project Structure
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+```text
+src/
+├── components/
+│   ├── AbilityCard.svelte
+│   ├── ActionButtons.svelte
+│   ├── CostTable.svelte
+│   ├── Footer.svelte
+│   ├── Header.svelte
+│   └── ProgressBar.svelte
+├── game/
+│   ├── abilities.ts
+│   ├── defaultScores.ts
+│   └── pointBuy.ts
+├── types/
+│   ├── ability.ts
+│   └── abilityCard.ts
+├── App.svelte
+├── app.css
+└── main.ts
 ```
+
+## 🚀 Development
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/<your-github-username>/dnd-point-buy.git
+cd dnd-point-buy
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Build the production version:
+
+```bash
+npm run build
+```
+
+The production build is generated in `dist/`.
+
+The project is configured to deploy automatically to GitHub Pages whenever changes are pushed to `main`.
+
+## 📦 Distribution
+
+The production build is bundled into a portable static site. The application requires no backend or database and all character creation calculations happen locally in the browser.
+
+## License
+
+The original source code in this repository is licensed under the MIT License.
+
+This project is an unofficial fan-made tool and is not affiliated with,
+endorsed, or sponsored by Wizards of the Coast.
+
+This work includes material from the System Reference Document 5.2
+("SRD 5.2") by Wizards of the Coast LLC, available at:
+https://www.dndbeyond.com/srd
+
+The SRD 5.2 is licensed under the Creative Commons Attribution 4.0
+International License (CC-BY-4.0).

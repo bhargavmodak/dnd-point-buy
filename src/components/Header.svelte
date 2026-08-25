@@ -1,10 +1,10 @@
 <header class="header">
     <h1>
-        <i class="fa-solid fa-dragon"></i>
-        D&D 2024 Point Buy
+        <i class="fa-solid fa-dice-d20"></i>
+        5E Point Buy
     </h1>
 
-    <p>Build your character using the official 27 Point Buy system.</p>
+    <p>Build your character using the 27-point ability score system.</p>
 </header>
 
 <style>

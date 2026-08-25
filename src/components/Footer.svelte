@@ -1,4 +1,4 @@
-<footer>Built for Dungeons and Dragons 2024 character creation.</footer>
+<footer>5E-compatible character creation tool · Unofficial fan project</footer>
 
 <style>
     footer {
