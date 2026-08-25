@@ -1,89 +1,150 @@
-<script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from './assets/vite.svg'
-  import heroImg from './assets/hero.png'
-  import Counter from './lib/Counter.svelte'
+<script lang="ts">
+    import Header from "./components/Header.svelte";
+    import ProgressBar from "./components/ProgressBar.svelte";
+    import AbilityCard from "./components/AbilityCard.svelte";
+    import ActionButtons from "./components/ActionButtons.svelte";
+    import CostTable from "./components/CostTable.svelte";
+    import Footer from "./components/Footer.svelte";
+
+    import { abilities } from "./game/abilities";
+    import { defaultScores } from "./game/defaultScores";
+    import {
+        MAX_SCORE,
+        MIN_SCORE,
+        TOTAL_POINTS,
+        cost,
+        modifier,
+        totalCost,
+    } from "./game/pointBuy";
+    import type { AbilityCardModel } from "./types/abilityCard";
+
+    type ScoreMap = typeof defaultScores;
+    type ScoreKey = keyof ScoreMap;
+
+    const standardArray = [15, 14, 13, 12, 10, 8] as const;
+
+    let scores = $state<ScoreMap>({ ...defaultScores });
+
+    const spentPoints = $derived(totalCost(Object.values(scores)));
+    const remainingPoints = $derived(TOTAL_POINTS - spentPoints);
+
+    const cards = $derived<AbilityCardModel[]>(
+        abilities.map((definition) => {
+            const key = definition.id as ScoreKey;
+            const scoreValue = scores[key];
+            const currentCost = cost(scoreValue);
+            const nextScore = scoreValue + 1;
+            const nextCost =
+                nextScore <= MAX_SCORE ? cost(nextScore) : currentCost;
+            const increaseDelta = nextCost - currentCost;
+
+            return {
+                definition,
+                score: {
+                    id: definition.id,
+                    score: scoreValue,
+                },
+                modifier: modifier(scoreValue),
+                cost: currentCost,
+                canIncrease:
+                    scoreValue < MAX_SCORE && increaseDelta <= remainingPoints,
+                canDecrease: scoreValue > MIN_SCORE,
+            };
+        }),
+    );
+
+    function increaseScore(id: string): void {
+        const key = id as ScoreKey;
+        const current = scores[key];
+
+        if (current >= MAX_SCORE) {
+            return;
+        }
+
+        const delta = cost(current + 1) - cost(current);
+        if (delta > remainingPoints) {
+            return;
+        }
+
+        scores[key] = current + 1;
+    }
+
+    function decreaseScore(id: string): void {
+        const key = id as ScoreKey;
+        const current = scores[key];
+
+        if (current <= MIN_SCORE) {
+            return;
+        }
+
+        scores[key] = current - 1;
+    }
+
+    function resetScores(): void {
+        scores = { ...defaultScores };
+    }
+
+    function applyStandardArray(): void {
+        const updated: ScoreMap = { ...defaultScores };
+
+        for (const [index, ability] of abilities.entries()) {
+            const key = ability.id as ScoreKey;
+            updated[key] = standardArray[index];
+        }
+
+        scores = updated;
+    }
 </script>
 
-<section id="center">
-  <div class="hero">
-    <img src={heroImg} class="base" width="170" height="179" alt="" />
-    <img src={svelteLogo} class="framework" alt="Svelte logo" />
-    <img src={viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/App.svelte</code> and save to test <code>HMR</code></p>
-  </div>
-  <Counter />
-</section>
+<svelte:head>
+    <title>D&D 2024 Point Buy Calculator</title>
+</svelte:head>
 
-<div class="ticks"></div>
+<main class="app" aria-label="Dungeons and Dragons point buy calculator">
+    <Header />
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#documentation-icon"></use>
-    </svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-          <img class="logo" src={viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://svelte.dev/" target="_blank" rel="noreferrer">
-          <img class="button-icon" src={svelteLogo} alt="" />
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#social-icon"></use>
-    </svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li>
-        <a href="https://github.com/vitejs/vite" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#github-icon"></use>
-          </svg>
-          GitHub
-        </a>
-      </li>
-      <li>
-        <a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#discord-icon"></use>
-          </svg>
-          Discord
-        </a>
-      </li>
-      <li>
-        <a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#x-icon"></use>
-          </svg>
-          X.com
-        </a>
-      </li>
-      <li>
-        <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#bluesky-icon"></use>
-          </svg>
-          Bluesky
-        </a>
-      </li>
-    </ul>
-  </div>
-</section>
+    <ProgressBar remaining={remainingPoints} total={TOTAL_POINTS} />
 
-<div class="ticks"></div>
-<section id="spacer"></section>
+    <section class="abilities" aria-label="Ability scores">
+        {#each cards as card}
+            <AbilityCard
+                {card}
+                onIncrease={increaseScore}
+                onDecrease={decreaseScore}
+            />
+        {/each}
+    </section>
+
+    <ActionButtons onReset={resetScores} onStandardArray={applyStandardArray} />
+
+    <CostTable remaining={remainingPoints} />
+
+    <Footer />
+</main>
+
+<style>
+    .app {
+        width: min(1100px, 100% - 2rem);
+        margin: 0 auto;
+        padding: clamp(1.25rem, 3vw, 2.5rem) 0 clamp(1.5rem, 4vw, 3rem);
+
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .abilities {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+    }
+
+    @media (max-width: 520px) {
+        .app {
+            width: min(1100px, 100% - 1.25rem);
+        }
+
+        .abilities {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
